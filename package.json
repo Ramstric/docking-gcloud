@@ -1,0 +1,63 @@
+{
+	"name": "docking-gcloud",
+	"version": "0.0.0",
+	"license": "MIT",
+	"bin": "dist/cli.js",
+	"type": "module",
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"test": "prettier --check . && xo && ava"
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"execa": "^9.6.0",
+		"gradient-string": "^3.0.0",
+		"ink": "^6.0.1",
+		"ink-ascii": "^0.0.4",
+		"ink-big-text": "^2.0.0",
+		"ink-gradient": "^3.0.0",
+		"ink-select-input": "^6.2.0",
+		"ink-text-input": "^6.0.0",
+		"js-yaml": "^4.1.0",
+		"react": "^19.1.0"
+	},
+	"devDependencies": {
+		"@sindresorhus/tsconfig": "^7.0.0",
+		"@types/js-yaml": "^4.0.9",
+		"@types/react": "^19.1.8",
+		"@vdemedes/prettier-config": "^2.0.1",
+		"ava": "^6.4.0",
+		"chalk": "^5.4.1",
+		"eslint-config-xo-react": "^0.28.0",
+		"eslint-plugin-react": "^7.37.5",
+		"eslint-plugin-react-hooks": "^5.2.0",
+		"ink-testing-library": "^4.0.0",
+		"prettier": "^3.6.2",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3",
+		"xo": "^1.1.1"
+	},
+	"ava": {
+		"extensions": {
+			"ts": "module",
+			"tsx": "module"
+		},
+		"nodeArguments": [
+			"--loader=ts-node/esm"
+		]
+	},
+	"xo": {
+		"extends": "xo-react",
+		"prettier": true,
+		"rules": {
+			"react/prop-types": "off"
+		}
+	},
+	"prettier": "@vdemedes/prettier-config"
+}
