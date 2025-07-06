@@ -1,7 +1,17 @@
 import React from 'react';
 import { Box, Text } from 'ink';
 
-export default function LogTasks({ configDone, imageBuilt, gcloudAuth, artifactRegistryCreated, imagePushed, cloudRunDeployed } : { configDone: boolean, imageBuilt: boolean, gcloudAuth: boolean, artifactRegistryCreated: boolean, imagePushed: boolean, cloudRunDeployed: boolean }) {
+type logTasksProps = {
+    setupCheck: boolean;
+    authCheck: boolean;
+    projectCheck: boolean;
+    registryCheck: boolean;
+    buildCheck: boolean;
+    pushCheck: boolean;
+    deployCheck: boolean;
+};
+
+export default function LogTasks({ setupCheck, authCheck, projectCheck, registryCheck, buildCheck, pushCheck, deployCheck }: logTasksProps) {
     
     // TODO: Support for Nerd Fonts
     /*
@@ -22,12 +32,13 @@ export default function LogTasks({ configDone, imageBuilt, gcloudAuth, artifactR
 
     return (
         <Box flexDirection="column" borderStyle="round" borderColor="#b8b8b8" paddingLeft={1} paddingRight={1}>
-            {configDone ? <Text color="#48f381">● Configuration setup</Text> : <Text color="#6e6e6e">◌ Configuration setup</Text>}
-            {imageBuilt ? <Text color="#48f381">● Docker image - built</Text> : <Text color="#6e6e6e">◌ Docker image - built</Text>}
-            {gcloudAuth ? <Text color="#48f381">● GCloud authentification</Text> : <Text color="#6e6e6e">◌ GCloud authentification</Text>}
-            {artifactRegistryCreated ? <Text color="#48f381">● Artifact Registry - created</Text> : <Text color="#6e6e6e">◌ Artifact Registry - created</Text>}
-            {imagePushed ? <Text color="#48f381">● Image - pushed to -</Text> : <Text color="#6e6e6e">◌ Image - pushed to -</Text>}
-            {cloudRunDeployed ? <Text color="#48f381">● Cloud Run deployed</Text> : <Text color="#6e6e6e">◌ Cloud Run deployed</Text>}
+            {setupCheck ? <Text color="#48f381">● Configuration setup</Text> : <Text color="#6e6e6e">◌ Configuration setup</Text>}
+            {buildCheck ? <Text color="#48f381">● Docker image - built</Text> : <Text color="#6e6e6e">◌ Docker image - built</Text>}
+            {authCheck ? <Text color="#48f381">● GCloud authentification</Text> : <Text color="#6e6e6e">◌ GCloud authentification</Text>}
+            {registryCheck ? <Text color="#48f381">● Artifact Registry - created</Text> : <Text color="#6e6e6e">◌ Artifact Registry - created</Text>}
+            {projectCheck ? <Text color="#48f381">● GCloud project - set</Text> : <Text color="#6e6e6e">◌ GCloud project - set</Text>}
+            {pushCheck ? <Text color="#48f381">● Image - pushed to -</Text> : <Text color="#6e6e6e">◌ Image - pushed to -</Text>}
+            {deployCheck ? <Text color="#48f381">● Cloud Run deployed</Text> : <Text color="#6e6e6e">◌ Cloud Run deployed</Text>}
         </Box>
     );
 

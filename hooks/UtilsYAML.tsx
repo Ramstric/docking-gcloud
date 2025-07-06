@@ -1,66 +1,30 @@
 import path from 'path';
 import fs from 'fs/promises';
 import yaml from 'js-yaml';
+import { z } from 'zod';
 
+const configSchema = z.object({
+  docker: z.object({
+    image_name: z.string().trim().nonempty(),
+    tag: z.string().trim().nonempty()
+  }),
+  google_cloud: z.object({
+    project_id: z.string().trim().nonempty(),
+    region: z.string().trim().nonempty()
+  }),
+  artifact_registry: z.object({
+    repository: z.string().trim().nonempty()
+  }),
+  cloud_run: z.object({
+    service: z.string().trim().nonempty()
+  })
+});
 
-type Config = {
-  docker: {
-    image_name?: string;
-    tag?: string;
-  };
-  google_cloud: {
-    project_id?: string;
-    region?: string;
-  };
-  artifact_registry: {
-    repository?: string;
-  };
-  cloud_run: {
-    service?: string;
-  };
-};
+type Config = z.infer<typeof configSchema>;
 
-const config: Config = {
-  docker: {},
-  google_cloud: {},
-  artifact_registry: {},
-  cloud_run: {}
-};
-
-function setParameter(paramName: string, paramValue: string) {
-  switch (paramName) {
-    case 'dockerImageName':
-      config.docker.image_name = paramValue;
-      break;
-    case 'dockerImageTag':
-      config.docker.tag = paramValue;
-      break;
-    case 'gcloudProjectID':
-      config.google_cloud.project_id = paramValue;
-      break;
-    case 'gcloudRegion':
-      config.google_cloud.region = paramValue;
-      break;
-    case 'arRepository':
-      config.artifact_registry.repository = paramValue;
-      break;
-    case 'gcrService':
-      config.cloud_run.service = paramValue;
-      break;
-    default:
-      throw new Error(`Unknown parameter: ${paramName}`);
-  }
-}
-
-function setParameters(parameters: {property: string, value: string }[]) {
-  parameters.forEach( ({ property, value }) => {
-      setParameter(property, value);
-  });
-}
-
-async function writeConfigToYamlFile(fileName: string) {
+async function writeYamlFile(fileName: string, loadedYaml: Config): Promise<void> {
   try {
-    const yamlContent = yaml.dump(config, {
+    const yamlContent = yaml.dump(loadedYaml, {
       indent: 2,
       lineWidth: -1,
       noRefs: true
@@ -74,15 +38,22 @@ async function writeConfigToYamlFile(fileName: string) {
   }
 }
 
-async function readConfigFromYamlFile(fileName: string): Promise<Config> {
+async function readYamlFile(fileName: string, setLoadedYaml: React.Dispatch<React.SetStateAction<Config>>): Promise<Config> {
   try {
     const filePath = path.join(process.cwd(), fileName);
     const fileContent = await fs.readFile(filePath, 'utf8');
+    const loadedYaml = yaml.load(fileContent) as Config;
 
-    return yaml.load(fileContent) as Config;
+    if (configSchema.safeParse(loadedYaml).error) {
+      throw new Error(`Invalid YAML structure in ${fileName}`);
+    }
+    
+    setLoadedYaml(loadedYaml);
+
+    return loadedYaml;
   } catch (error: any) {
     throw new Error(`Failed to read YAML file: ${error.message}`);
   }
 }
 
-export { setParameters, writeConfigToYamlFile, readConfigFromYamlFile };
+export { Config, configSchema, writeYamlFile, readYamlFile };

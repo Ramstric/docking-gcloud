@@ -2,7 +2,7 @@
 	"name": "docking-gcloud",
 	"version": "0.0.0",
 	"license": "MIT",
-	"bin": "dist/cli.js",
+	"bin": "dist/source/cli.js",
 	"type": "module",
 	"engines": {
 		"node": ">=16"
@@ -25,7 +25,9 @@
 		"ink-select-input": "^6.2.0",
 		"ink-text-input": "^6.0.0",
 		"js-yaml": "^4.1.0",
-		"react": "^19.1.0"
+		"react": "^19.1.0",
+		"react-devtools-core": "^4.28.5",
+		"zod": "^3.25.74"
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^7.0.0",
