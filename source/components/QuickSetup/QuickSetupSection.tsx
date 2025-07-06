@@ -18,14 +18,13 @@ interface ConfigSectionProps {
     entries: YamlEntry[];
     selectedIndex: number;
 }
-
+// TODO: Why does this causes re rendering issues when using gap or marginTop?
 export default function YamlSection({ title, titleColor = "#4F4F4F", entryColor = "#FF3F5F", entries, selectedIndex }: ConfigSectionProps) {
     return (
         <Box flexDirection='column'>
             <Text color={titleColor}>{title}</Text>
-            <Box flexDirection='column' marginLeft={4}>
                 {entries.map((entry) => (
-                    <Box key={entry.propertyName}>
+                    <Box key={entry.propertyName} marginLeft={4}>
                         <Text color={entryColor}>{entry.propertyName}: </Text>
                         <TextInput 
                             placeholder={entry.placeholder}
@@ -35,7 +34,6 @@ export default function YamlSection({ title, titleColor = "#4F4F4F", entryColor 
                         />
                     </Box>
                 ))}
-            </Box>
         </Box>
     );
 }

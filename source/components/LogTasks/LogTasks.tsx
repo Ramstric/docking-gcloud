@@ -33,11 +33,11 @@ export default function LogTasks({ setupCheck, authCheck, projectCheck, registry
     return (
         <Box flexDirection="column" borderStyle="round" borderColor="#b8b8b8" paddingLeft={1} paddingRight={1}>
             {setupCheck ? <Text color="#48f381">● Configuration setup</Text> : <Text color="#6e6e6e">◌ Configuration setup</Text>}
-            {buildCheck ? <Text color="#48f381">● Docker image - built</Text> : <Text color="#6e6e6e">◌ Docker image - built</Text>}
+            {buildCheck ? <Text color="#48f381">● Docker image built</Text> : <Text color="#6e6e6e">◌ Docker image built</Text>}
             {authCheck ? <Text color="#48f381">● GCloud authentification</Text> : <Text color="#6e6e6e">◌ GCloud authentification</Text>}
-            {registryCheck ? <Text color="#48f381">● Artifact Registry - created</Text> : <Text color="#6e6e6e">◌ Artifact Registry - created</Text>}
-            {projectCheck ? <Text color="#48f381">● GCloud project - set</Text> : <Text color="#6e6e6e">◌ GCloud project - set</Text>}
-            {pushCheck ? <Text color="#48f381">● Image - pushed to -</Text> : <Text color="#6e6e6e">◌ Image - pushed to -</Text>}
+            {registryCheck ? <Text color="#48f381">● Artifact Registry created</Text> : <Text color="#6e6e6e">◌ Artifact Registry created</Text>}
+            {projectCheck ? <Text color="#48f381">● GCloud project set</Text> : <Text color="#6e6e6e">◌ GCloud project set</Text>}
+            {pushCheck ? <Text color="#48f381">● Image pushed</Text> : <Text color="#6e6e6e">◌ Image pushed</Text>}
             {deployCheck ? <Text color="#48f381">● Cloud Run deployed</Text> : <Text color="#6e6e6e">◌ Cloud Run deployed</Text>}
         </Box>
     );

@@ -205,6 +205,7 @@ export default function App() {
 				{currentHint()}
 			</Box>
 
+			// TODO: Better tab navigation
 			<Box width="100%" gap={6} justifyContent="center">
 				{tabSample("Setup", "#4aaeff", "#0c4370", currentView, "setup")}
 				{tabSample("Main menu", "#ff564a", "#70130c", currentView, "menu")}

@@ -85,13 +85,15 @@ export default function SetupMenu({ setSetupCheck, setCurrentView, loadedYaml, s
         },
     });
 
-    return (
-        <Box flexDirection="column" width="40" gap={1}>
+    return ( // TODO: Removed gap because it was causing re-rendering issues. Must be fixed later.
+        <Box flexDirection="column" width="40">
             {fieldsFilled ? <Text color="green">All fields are filled</Text> : <Text color="red">Please fill all fields</Text> }
+            
             <YamlSection entryColor='#1d63ed' title="Docker" entries={dockerEntries} selectedIndex={selectedIndex}/>
             <YamlSection entryColor='#dcdcdc' title="GCloud" entries={gcloudEntries} selectedIndex={selectedIndex}/>
             <YamlSection title="Artifact Registry" entries={arEntries} selectedIndex={selectedIndex}/>
             <YamlSection entryColor='#447ec5' title="GCR Service" entries={gcrEntries} selectedIndex={selectedIndex}/>
+            
         </Box>
     )
 }
