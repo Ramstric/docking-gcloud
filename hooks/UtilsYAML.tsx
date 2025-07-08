@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 const configSchema = z.object({
   docker: z.object({
+    project_path: z.string().trim().nonempty(),
     image_name: z.string().trim().nonempty(),
     tag: z.string().trim().nonempty()
   }),

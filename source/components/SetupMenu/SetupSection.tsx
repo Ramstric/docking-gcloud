@@ -38,6 +38,8 @@ export default function YamlSection({ title, titleColor = "#4F4F4F", entryColor 
     );
 }
 
+
+/*
 interface CustomYamlSectionProps {
     title: string;
     titleColor?: string;
@@ -54,3 +56,4 @@ export function CustomYamlSection({ title, titleColor = "#4F4F4F", children }: C
         </Box>
     );
 }
+*/

@@ -6,13 +6,17 @@ import {useApp, useInput, Box, Text} from 'ink';
 import Gradient from 'ink-gradient';
 import BigText from 'ink-big-text';
 
-import SetupMenu from './components/QuickSetup/QuickSetup.js';
+import SetupMenu from './components/SetupMenu/SetupMenu.js';
 import LogTasks from './components/LogTasks/LogTasks.js';
+import BuildDeployMenu from './components/BuildDeployMenu/BuildDeployMenu.js';
 import Tooltip from './components/Tooltip/Tooltip.js';
 
 import {Config, readYamlFile} from '../hooks/UtilsYAML.js';
 
+import {checkState, possibleViews} from './components/types/index.js';
+
 const YAML_FILE_NAME = 'gcloudDeploy.yaml';
+
 
 const heroGradient = [
 	'#ff6b6b',
@@ -26,20 +30,22 @@ const heroGradient = [
 ];
 
 export default function App() {
-	const [currentView, setCurrentView] = useState<'menu' | 'setup'>('menu');
+	const [currentView, setCurrentView] = useState<possibleViews>('menu');
 
-	const [loadedYAML, setLoadedYaml] = useState<Config>({ docker: { image_name: '', tag: '' }, google_cloud: { project_id: '', region: '' }, artifact_registry: { repository: '' }, cloud_run: { service: '' } });
+	const [loadedYAML, setLoadedYaml] = useState<Config>({ docker: { project_path: '', image_name: '', tag: '' }, google_cloud: { project_id: '', region: '' }, artifact_registry: { repository: '' }, cloud_run: { service: '' } });
 	const [setupCheck, setSetupCheck] = useState<boolean>(false);
 	
-	const [authCheck, setAuthCheck] = useState<boolean>(false);
-	const [projectCheck, setProjectCheck] = useState<boolean>(false);
-	const [registryCheck, setRegistryCheck] = useState<boolean>(false);
+	const [authCheck, setAuthCheck] = useState<checkState>(false);
+	const [projectCheck, setProjectCheck] = useState<checkState>(false);
+	const [registryCheck, setRegistryCheck] = useState<checkState>(false);
 
-	const [buildCheck, setBuildCheck] = useState<boolean>(false);
-	const [pushCheck, setPushCheck] = useState<boolean>(false);
-	const [deployCheck, setDeployCheck] = useState<boolean>(false);
+	const tasksCheckpoint = setupCheck === true && authCheck === true && projectCheck === true && registryCheck === true;
+
+	const [buildCheck, setBuildCheck] = useState<checkState>(false);
+	const [pushCheck, setPushCheck] = useState<checkState>(false);
+	const [deployCheck, setDeployCheck] = useState<checkState>(false);
+
 	
-
 	// Check if the YAML file exists and read it if it does
 		// If the file exists, read it and set the loaded YAML state
 		// If the file does not exist, it will be created later
@@ -52,36 +58,38 @@ export default function App() {
 		});
 	}
 
+
+	// TODO: Move task checks logic into LogTasks component
 	const tasksList = [
 		{
 			state: setAuthCheck,
 			command: 'gcloud',
-			options: ['config', 'get-value', 'account'],
+			options: ['config', 'get-value', 'account']
 		},
 		{
 			state: setProjectCheck,
 			command: 'gcloud',
-			options: ['projects', 'describe', loadedYAML.google_cloud.project_id],
+			options: ['projects', 'describe', loadedYAML.google_cloud.project_id]
 		},
 		{
 			state: setRegistryCheck,
 			command: 'gcloud',
-			options: ['artifacts', 'repositories', 'describe', loadedYAML.artifact_registry.repository, '--location', loadedYAML.google_cloud.region ],
+			options: ['artifacts', 'repositories', 'describe', loadedYAML.artifact_registry.repository, '--location', loadedYAML.google_cloud.region ]
 		},
 		{
 			state: setBuildCheck,
 			command: 'docker',
-			options: ['images', '-q', `${loadedYAML.google_cloud.region}-docker.pkg.dev/${loadedYAML.google_cloud.project_id}/${loadedYAML.artifact_registry.repository}/${loadedYAML.docker.image_name}:${loadedYAML.docker.tag}`],
+			options: ['images', '-q', `${loadedYAML.google_cloud.region}-docker.pkg.dev/${loadedYAML.google_cloud.project_id}/${loadedYAML.artifact_registry.repository}/${loadedYAML.docker.image_name}:${loadedYAML.docker.tag}`]
 		},
 		{
 			state: setPushCheck,
 			command: 'gcloud',
-			options: ['artifacts', 'docker', 'images', 'list', `${loadedYAML.google_cloud.region}-docker.pkg.dev/${loadedYAML.google_cloud.project_id}/${loadedYAML.artifact_registry.repository}`],
+			options: ['artifacts', 'docker', 'images', 'list', `${loadedYAML.google_cloud.region}-docker.pkg.dev/${loadedYAML.google_cloud.project_id}/${loadedYAML.artifact_registry.repository}/${loadedYAML.docker.image_name}`] 
 		},
 		{
 			state: setDeployCheck,
 			command: 'gcloud',
-			options: ['run', 'services', 'describe', loadedYAML.cloud_run.service, '--region', loadedYAML.google_cloud.region],
+			options: ['run', 'services', 'describe', loadedYAML.cloud_run.service, '--region', loadedYAML.google_cloud.region]
 		},
 	];
 	
@@ -89,6 +97,7 @@ export default function App() {
 		if (currentView === 'menu' && setupCheck) {
 			tasksList.forEach(async (task) => {
 				try {
+					task.state('pending'); 
 					const {stdout} = await execa(task.command, task.options);
 					if (stdout) {
 						task.state(true);
@@ -100,6 +109,7 @@ export default function App() {
 				}
 			});
 		}
+
 		/*
 		runCommand('gcloud projects list')
 			.then(() => {
@@ -117,24 +127,26 @@ export default function App() {
 				_setGcloudAuth(false);
 			});
 		*/
-	}, [setupCheck]);
+	}, [setupCheck, currentView]);
 
 	const {exit} = useApp();
 
-	useInput(async (_input, key) => {
-		if (key.escape) {
+	useInput(async (input, key) => {
+		if (key.ctrl && input === 'c') {
 			exit();
+		} else if (key.escape) {
+			setCurrentView('menu');
 		}
 	});
 
-	useInput(
-		async (input, _key) => {
-			if (input === 'q') {
-				setCurrentView('setup');
-			}
-		},
-		{isActive: currentView === 'menu'},
-	);
+	useInput(async (input, _key) => {
+		if (input === '1') {
+			setCurrentView('setup');
+		}
+		else if (input === '2' && tasksCheckpoint) {
+			setCurrentView('b&d');
+		}
+	}, {isActive: currentView === 'menu'});
 
 	const currentHint = () => {
 		if (!setupCheck){
@@ -154,16 +166,13 @@ export default function App() {
 		}
 	}
 	
-	function tabSample( title: string, titleColor: string, borderColor: string, currentView: string, key: string ) {
+	function tabSample( title: string, primaryColor: string, secondaryColor: string, currentView: string, key: string ) {
 		const isActive = currentView === key;
 
 		return (
-			<Box width={16} justifyContent='center' height={2} /*marginTop={isActive ? -1 : 0}*/
-				borderStyle="single"
-				borderBottom={!isActive} borderTop={isActive} borderLeft={false} borderRight={false}
-				borderColor={borderColor}
+			<Box width={16} justifyContent='center' /*marginTop={isActive ? -1 : 0}*/
 			>
-				<Text color={titleColor}>
+				<Text color={isActive ? primaryColor : secondaryColor}>
 					{title}
 				</Text>
 			</Box>
@@ -183,7 +192,17 @@ export default function App() {
 							buildCheck={buildCheck}
 							pushCheck={pushCheck}
 							deployCheck={deployCheck}
-						/>
+						/>;
+			case 'b&d':
+				return <BuildDeployMenu
+							loadedYAML={loadedYAML}
+							buildCheck={buildCheck}
+							pushCheck={pushCheck}
+							deployCheck={deployCheck}
+							setBuildCheck={setBuildCheck}
+							setPushCheck={setPushCheck}
+							setDeployCheck={setDeployCheck}
+						/>;
 			default:
 				return (
 					<Box flexDirection="column" alignItems="center" justifyContent="center" gap={1}>
@@ -193,11 +212,11 @@ export default function App() {
 		}
 	}
 
-	const currentTooltip = Tooltip({ currentView: currentView, primaryColor: '#4aaeff', secondaryColor: '#808080' });
+	const currentTooltip = Tooltip({ currentView: currentView, primaryColor: '#c3c3c3', secondaryColor: '#565656' });
 
 	return (
-		<Box flexDirection="column" alignItems="center" justifyContent="center" gap={1} borderStyle="round" borderColor='#212121'>
-			<Box flexDirection="column" gap={0} width="100%" alignItems="center" justifyContent="center">
+		<Box flexDirection="column" alignItems="center" justifyContent="flex-start" gap={1}>
+			<Box flexDirection="column" alignItems="center" justifyContent="center">
 				<Gradient colors={heroGradient}>
 					<BigText font="tiny" text="Docker to GCloud" />
 				</Gradient>
@@ -205,14 +224,11 @@ export default function App() {
 				{currentHint()}
 			</Box>
 
-			// TODO: Better tab navigation
-			<Box width="100%" gap={6} justifyContent="center">
-				{tabSample("Setup", "#4aaeff", "#0c4370", currentView, "setup")}
-				{tabSample("Main menu", "#ff564a", "#70130c", currentView, "menu")}
-				{tabSample("Build & Deploy", "#f3ff4a", "#705c0c", currentView, "build")}
-			</Box>
-
-			<Box width='80%' marginTop={-1} borderStyle="single" borderColor="#0c4370" borderLeft={false} borderRight={false} borderBottom={false} >
+			{/* TODO: Better tab navigation */}
+			<Box width="100%" justifyContent="center" gap={6}>
+				{tabSample("Setup", "#4aaeff", "#0a5089", currentView, "setup")}
+				{tabSample("Main menu", "#ff564a", "#86130b", currentView, "menu")}
+				{tabSample("Build & Deploy", "#f1c40e", tasksCheckpoint ? "#8d730a" : "#565656", currentView, "b&d")}
 			</Box>
 
 			{currentMenu()}
