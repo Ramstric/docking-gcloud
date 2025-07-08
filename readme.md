@@ -47,6 +47,12 @@ A TUI tool for automating the build of Docker images, push to Google Cloud Artif
   docking-gcloud
   ```
 
+## Uninstall
+
+Just remove the symbolic link / package:
+  ```bash
+  npm r docking-gcloud -g
+  ```
 
 ## Project Structure
 
