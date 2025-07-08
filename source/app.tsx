@@ -7,7 +7,7 @@ import Gradient from 'ink-gradient';
 import BigText from 'ink-big-text';
 
 import SetupMenu from './components/SetupMenu/SetupMenu.js';
-import LogTasks from './components/LogTasks/LogTasks.js';
+import LogTasks from './components/LogMenu/LogMenu.js';
 import BuildDeployMenu from './components/BuildDeployMenu/BuildDeployMenu.js';
 import Tooltip from './components/Tooltip/Tooltip.js';
 
