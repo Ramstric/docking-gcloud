@@ -24,7 +24,7 @@ A TUI tool for automating the build of Docker images, push to Google Cloud Artif
 
 ## Usage
 
-1. Configure authentication for Docker and Google Cloud:
+1. Set up Google Cloud CLI:
   ```bash
   gcloud auth login
   gcloud config set project YOUR_PROJECT_ID
@@ -70,11 +70,8 @@ Just remove the symbolic link / package:
           ├───BuildDeployMenu
           │       BuildDeployMenu.tsx
           │
-          ├───LogTasks
-          │       LogTasks.tsx
-          │
-          ├───OptionsMenu
-          │       OptionsMenu.tsx
+          ├───LogMenu
+          │       LogMenu.tsx
           │
           ├───SetupMenu
           │       SetupMenu.tsx
